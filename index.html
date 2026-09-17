@@ -1,0 +1,1039 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="SK Workout Zone - Premier Unisex Gym in Jamdoli, Jaipur. Build muscle, burn fat, and achieve your fitness goals." />
+    <title>SK Workout Zone | Unisex Gym Jaipur</title>
+    <link rel="icon" type="image/png" href="logo.png">
+    <link rel="preconnect" href="https://images.unsplash.com" />
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  </head>
+  <body>
+    <!-- Full-screen Page Loader -->
+    <div class="loader" id="loader">
+      <div style="position: relative; display: grid; place-items: center;">
+        <div class="loader-ring" style="position: absolute; width: 88px; height: 88px;"></div>
+        <img src="logo.png" alt="SK Workout Zone" style="width: 56px; height: 56px; border-radius: 50%; object-fit: contain; z-index: 2;" />
+      </div>
+      <span style="letter-spacing: 0.16em;">SK WORKOUT ZONE</span>
+      <span style="font-size: 0.72rem; color: var(--lime); margin-top: -12px; letter-spacing: 0.22em; font-weight: 800;">UNISEX GYM</span>
+    </div>
+
+    <!-- Particle Background Canvas -->
+    <canvas id="particleCanvas" aria-hidden="true"></canvas>
+    
+    <!-- Cursor Glow Effect -->
+    <div class="cursor-glow" id="cursorGlow" aria-hidden="true"></div>
+    
+    <!-- Top Progress Scroll/Transition Line -->
+    <div class="progress-line" id="progressLine" aria-hidden="true"></div>
+
+    <!-- Navigation Header -->
+    <header class="site-header" id="siteHeader">
+      <a class="logo" href="#home" onclick="switchView('member-portal')" aria-label="SK Workout Zone home">
+        <img src="logo.png" alt="SK Workout Zone Logo" class="logo-img" />
+        <div class="logo-text">
+          <strong>SK WORKOUT ZONE</strong>
+          <span class="logo-sub">UNISEX GYM</span>
+        </div>
+      </a>
+      <nav class="nav-links" id="navLinks" aria-label="Main navigation">
+        <a href="#programs" onclick="switchView('member-portal')">Programs</a>
+        <a href="#plans" onclick="switchView('member-portal')">Plans</a>
+        <a href="#gallery" onclick="switchView('member-portal')">Gallery</a>
+        <a href="#contact" onclick="switchView('member-portal')">Contact</a>
+        <a href="https://www.instagram.com/sk_workout_zone_2711?utm_source=qr&igsi=MWQyMnhsNjl3aTNkNw==" target="_blank" style="color: #e1306c; display: inline-flex; align-items: center; gap: 6px;"><i class="fa-brands fa-instagram"></i> Instagram</a>
+        <a href="#admin" id="navAdminLink" onclick="switchView('admin-portal')" style="color: var(--lime); border-bottom: 1px dashed rgba(185, 255, 40, 0.4); display: none;"><i class="fa-solid fa-gauge-high"></i> Admin Dashboard</a>
+        <a href="javascript:void(0)" id="mobileOwnerLink" onclick="openAdminLoginModal()" style="color: var(--muted);"><i class="fa-solid fa-lock"></i> Owner Login</a>
+      </nav>
+      <button class="nav-toggle" id="navToggle" type="button" aria-label="Open menu">
+        <span></span>
+        <span></span>
+      </button>
+      <div class="header-actions">
+        <button id="headerOwnerBtn" class="header-owner-btn" onclick="handleOwnerHeaderClick()" type="button" title="Owner Access">
+          <i class="fa-solid fa-lock"></i> <span>Owner</span>
+        </button>
+        <button class="join-btn small" data-open-join type="button">Join Now</button>
+      </div>
+    </header>
+
+    <!-- Main Workspace -->
+    <main>
+      
+      <!-- ================= VIEW 1: MEMBER PORTAL (Codex Landing Page) ================= -->
+      <div id="member-portal-view" class="view-section active">
+        <section class="hero" id="home">
+          <div class="hero-media" aria-hidden="true"></div>
+          <div class="hero-shade" aria-hidden="true"></div>
+          <div class="hero-content">
+            <div id="heroOwnerBadge" style="display: none; margin-bottom: 16px;">
+              <a href="javascript:void(0)" onclick="switchView('admin-portal')" style="display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px; border-radius: 999px; background: rgba(185, 255, 40, 0.14); border: 1px solid rgba(185, 255, 40, 0.45); color: var(--lime); font-size: 0.82rem; font-weight: 850; text-decoration: none; box-shadow: 0 0 16px rgba(185, 255, 40, 0.2); transition: all 0.2s ease;">
+                <i class="fa-solid fa-shield-halved"></i> <span>Owner Logged In &bull; Tap here for Admin Dashboard &rarr;</span>
+              </a>
+            </div>
+
+            <!-- Front-Page Holiday & Special Announcement Banner -->
+            <div id="frontHolidayNotice" class="front-holiday-notice" style="display: none;">
+              <div class="holiday-icon-box"><i class="fa-solid fa-bullhorn"></i></div>
+              <div class="holiday-content-box">
+                <div class="holiday-badge-tag" id="frontHolidayTitle">GYM NOTICE</div>
+                <div class="holiday-msg-text" id="frontHolidayDesc">Gym is closed today.</div>
+              </div>
+            </div>
+
+            <!-- Live Status Pill & Timings Row -->
+            <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 14px;">
+              <span id="liveGymStatusPill" class="live-status-pill open">
+                <span class="live-dot"></span>
+                <strong id="liveGymStatusText">OPEN NOW</strong>
+                <span id="liveGymStatusSub" style="font-weight: 600; opacity: 0.85;">(5-10 AM | 5-10 PM)</span>
+              </span>
+              <span class="eyebrow" style="margin: 0; padding: 4px 10px; font-size: 0.72rem; letter-spacing: 0.12em;">Unisex Gym Jaipur</span>
+            </div>
+
+            <h1 class="reveal">Build muscle, burn fat, and train like you mean it.</h1>
+            <p class="hero-copy reveal">
+              Premium gym floor, strength coaching, HIIT classes, personal training, diet guidance, and flexible memberships.
+            </p>
+            <div class="hero-actions reveal">
+              <button class="join-btn" data-open-join type="button">Start Membership</button>
+              <a class="ghost-btn" href="#plans">View Packages</a>
+            </div>
+          </div>
+          <div class="hero-stats reveal">
+            <article><strong data-count="850">0</strong><span>Members trained</span></article>
+            <article>
+              <strong style="font-size: clamp(1.1rem, 2vw, 1.7rem); line-height: 1.2; margin-bottom: 2px; display: block;">5-10 AM | 5-10 PM</strong>
+              <span style="font-size: 0.8rem; color: var(--muted); font-weight: 800; margin-top: 4px;">Mon - Sat (Sunday Closed)</span>
+            </article>
+            <article id="hero-live-calendar">
+              <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                <strong id="hero-cal-date" style="color: var(--lime);">15</strong>
+                <span id="hero-cal-status-badge" class="cal-status-tag open">OPEN</span>
+              </div>
+              <span id="hero-cal-day-month" style="font-size: 0.8rem; color: var(--muted); font-weight: 800; margin-top: 4px;">Wednesday, July</span>
+            </article>
+          </div>
+          <a class="scroll-cue" href="#programs" aria-label="Scroll to programs">
+            <span></span>
+          </a>
+        </section>
+
+        <section class="marquee" aria-label="Training highlights">
+          <div class="marquee-track">
+            <span>Strength Training</span>
+            <span>HIIT</span>
+            <span>Crossfit</span>
+            <span>Fat Loss</span>
+            <span>Personal Training</span>
+            <span>Nutrition</span>
+            <span>Boxing</span>
+            <span>Mobility</span>
+            <span>Strength Training</span>
+            <span>HIIT</span>
+            <span>Crossfit</span>
+            <span>Fat Loss</span>
+          </div>
+        </section>
+
+        <section class="section programs" id="programs">
+          <div class="section-head reveal">
+            <p class="eyebrow">Programs</p>
+            <h2>Training built for real results.</h2>
+            <p>Pick your lane and we will push the pace with structured workouts, tracking, and coaching.</p>
+          </div>
+          <div class="program-grid">
+            <article class="program-card reveal">
+              <img src="https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&w=900&q=80" alt="Strength training" />
+              <div>
+                <span>01</span>
+                <h3>Strength Zone</h3>
+                <p>Barbells, machines, free weights, progressive overload plans, and form correction.</p>
+              </div>
+            </article>
+            <article class="program-card reveal">
+              <img src="https://images.unsplash.com/photo-1518611012118-696072aa579a?auto=format&fit=crop&w=900&q=80" alt="Functional training" />
+              <div>
+                <span>02</span>
+                <h3>HIIT Studio</h3>
+                <p>Fast circuits, sled pushes, battle ropes, kettlebells, and conditioning finishers.</p>
+              </div>
+            </article>
+            <article class="program-card reveal">
+              <img src="https://images.unsplash.com/photo-1549060279-7e168fcee0c2?auto=format&fit=crop&w=900&q=80" alt="Personal coaching" />
+              <div>
+                <span>03</span>
+                <h3>Personal Coaching</h3>
+                <p>One to one training, diet check-ins, posture work, progress photos, and goal tracking.</p>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <section class="section split-section">
+          <!-- Left Column: Gym Amenities / Features (Replaced Class Schedule) -->
+          <div class="class-panel reveal" style="background: linear-gradient(135deg, rgba(255, 255, 255, 0.11), rgba(255, 255, 255, 0.05)); padding: clamp(22px, 4vw, 40px); display: flex; flex-direction: column; justify-content: center; gap: 14px;">
+            <p class="eyebrow">Premium Features</p>
+            <h2>State-Of-The-Art Gym Floor</h2>
+            <p style="color: var(--muted); margin: 0 0 10px; line-height: 1.6;">SK Workout Zone offers a premium unisex workout space designed to support all training levels, with dedicated zones and high-end amenities:</p>
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px;">
+              <div style="display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 0.95rem; color: var(--text);">
+                <i class="fa-solid fa-dumbbell" style="color: var(--lime);"></i> Heavy Weight Area
+              </div>
+              <div style="display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 0.95rem; color: var(--text);">
+                <i class="fa-solid fa-heart-pulse" style="color: var(--lime);"></i> Cardio Zone
+              </div>
+              <div style="display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 0.95rem; color: var(--text);">
+                <i class="fa-solid fa-snowflake" style="color: var(--lime);"></i> Air Conditioned
+              </div>
+              <div style="display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 0.95rem; color: var(--text);">
+                <i class="fa-solid fa-shower" style="color: var(--lime);"></i> Changing Rooms
+              </div>
+            </div>
+          </div>
+          <div class="bmi-card reveal" style="display: flex; flex-direction: column;">
+            <p class="eyebrow">Body check</p>
+            <h2>Body Analyzer</h2>
+            
+            <!-- Tabs inside card -->
+            <div class="tabs" style="margin: 14px 0 18px; display: flex; gap: 8px;">
+              <button class="tab active" id="tab-bmi" onclick="toggleBodyCheckTab('bmi')" type="button" style="flex: 1; padding: 0 10px; font-size: 0.82rem; min-height: 38px;">BMI Index</button>
+              <button class="tab" id="tab-calorie" onclick="toggleBodyCheckTab('calorie')" type="button" style="flex: 1; padding: 0 10px; font-size: 0.82rem; min-height: 38px;">Daily Calories</button>
+            </div>
+
+            <!-- TAB 1: BMI Section -->
+            <div id="body-check-bmi-section">
+              <div class="bmi-fields" style="margin-top: 10px;">
+                <label>Height (cm)<input id="heightInput" type="number" min="80" max="240" value="175" /></label>
+                <label>Weight (kg)<input id="weightInput" type="number" min="25" max="250" value="72" /></label>
+              </div>
+              <button class="join-btn" id="bmiBtn" type="button" style="width: 100%; margin-top: 14px;">Calculate BMI</button>
+              
+              <div class="bmi-result" id="bmiResult" style="margin-top: 18px; min-height: auto; padding: 16px; text-align: center;">
+                <strong>23.5</strong>
+                <span id="bmi-label" style="display: block; font-weight: 850; margin-top: 4px; color: var(--lime);">Healthy range</span>
+                <p id="bmi-feedback" style="font-size: 0.74rem; color: var(--muted); margin: 6px 0 0; line-height: 1.4;">Healthy range is 18.5 - 24.9. Your weight is ideal!</p>
+              </div>
+            </div>
+
+            <!-- TAB 2: Calorie Section (TDEE Calculator) -->
+            <div id="body-check-calorie-section" style="display: none;">
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 10px;">
+                <label>Age (years)<input id="calAge" type="number" min="10" max="100" value="25" /></label>
+                <label>Gender
+                  <select id="calGender">
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                  </select>
+                </label>
+                <label>Height (cm)<input id="calHeight" type="number" min="80" max="240" value="175" /></label>
+                <label>Weight (kg)<input id="calWeight" type="number" min="25" max="250" value="72" /></label>
+              </div>
+              <div style="margin-top: 12px; display: grid;">
+                <label>Activity Level
+                  <select id="calActivity">
+                    <option value="1.2">Sedentary (No gym / Desk job)</option>
+                    <option value="1.375">Lightly Active (Gym 1-3 days/wk)</option>
+                    <option value="1.55" selected>Moderately Active (Gym 3-5 days/wk)</option>
+                    <option value="1.725">Very Active (Gym 6-7 days/wk)</option>
+                    <option value="1.9">Elite (Athlete / Physical job)</option>
+                  </select>
+                </label>
+              </div>
+              <button class="join-btn" id="calBtn" onclick="calculateCalories()" type="button" style="width: 100%; margin-top: 14px; background: linear-gradient(135deg, var(--lime), var(--mint));">
+                Calculate Calories
+              </button>
+
+              <!-- Calorie Suggestions Results -->
+              <div class="calorie-results-box" id="calorieResult" style="display: none; margin-top: 18px; border: 1px solid var(--line); border-radius: var(--radius); padding: 14px; background: rgba(0,0,0,0.2);">
+                <div style="text-align: center; margin-bottom: 12px;">
+                  <span class="eyebrow" style="margin-bottom: 4px; display: block; font-size: 0.72rem;">Maintenance Calories</span>
+                  <strong id="cal-maintenance" style="font-size: 1.8rem; color: var(--lime); line-height: 1;">2,450</strong> <span style="font-size: 0.8rem; color: var(--muted);">kcal/day</span>
+                </div>
+                <div style="display: grid; gap: 10px; font-size: 0.76rem;">
+                  <div style="border-left: 3px solid var(--blue); padding-left: 10px;">
+                    <strong style="color: var(--blue);">Bulking (Gain Muscle):</strong>
+                    <div style="margin-top: 2px;"><span id="cal-bulking" style="font-weight: 850; font-size:0.86rem; color: var(--text);">2,750</span> kcal/day (+300 kcal surplus)</div>
+                  </div>
+                  <div style="border-left: 3px solid var(--red); padding-left: 10px;">
+                    <strong style="color: var(--red);">Weight Loss (Cut Fat):</strong>
+                    <div style="margin-top: 2px;"><span id="cal-cutting" style="font-weight: 850; font-size:0.86rem; color: var(--text);">1,950</span> kcal/day (-500 kcal deficit)</div>
+                  </div>
+                  <div style="border-left: 3px solid var(--mint); padding-left: 10px;">
+                    <strong style="color: var(--mint);">Body Recomp (Only Fat Loss):</strong>
+                    <div style="margin-top: 2px;"><span id="cal-recomp" style="font-weight: 850; font-size:0.86rem; color: var(--text);">2,250</span> kcal/day (-200 kcal + high protein)</div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </section>
+
+        <section class="section plans" id="plans">
+          <div class="section-head reveal">
+            <p class="eyebrow">Membership</p>
+            <h2>Packages for every goal.</h2>
+            <p>Simple pricing for new joiners. Packages can be customized with discount pricing from the Admin Portal.</p>
+          </div>
+          <div class="plan-grid">
+            <article class="price-card reveal">
+              <span class="plan-duration">1 Month</span>
+              <h3>Starter</h3>
+              <strong>INR 1,000</strong>
+              <p>Best for trial and short-term fitness goals.</p>
+              <button onclick="selectPlanShort('1')" type="button">Choose Plan</button>
+            </article>
+            <article class="price-card reveal hot">
+              <span class="badge">Popular</span>
+              <span class="plan-duration">3 Months</span>
+              <h3>Momentum</h3>
+              <strong>INR 2,500</strong>
+              <p>Perfect for fat loss, strength base, and habit building.</p>
+              <button onclick="selectPlanShort('3')" type="button">Choose Plan</button>
+            </article>
+            <article class="price-card reveal">
+              <span class="plan-duration">6 Months</span>
+              <h3>Transform</h3>
+              <strong>INR 4,500</strong>
+              <p>For visible transformation with coaching support.</p>
+              <button onclick="selectPlanShort('6')" type="button">Choose Plan</button>
+            </article>
+            <article class="price-card reveal">
+              <span class="plan-duration">1 Year</span>
+              <h3>Elite</h3>
+              <strong>INR 8,000</strong>
+              <p>Maximum value for serious long-term training.</p>
+              <button onclick="selectPlanShort('12')" type="button">Choose Plan</button>
+            </article>
+          </div>
+        </section>
+
+        <section class="section gallery" id="gallery">
+          <div class="section-head reveal">
+            <p class="eyebrow">Inside the club</p>
+            <h2>Energy you can feel before the first set.</h2>
+          </div>
+          <div class="gallery-grid">
+            <img class="reveal tall" src="https://images.unsplash.com/photo-1571902943202-507ec2618e8f?auto=format&fit=crop&w=900&q=80" alt="Gym equipment area" />
+            <img class="reveal" src="https://images.unsplash.com/photo-1554284126-aa88f22d8b74?auto=format&fit=crop&w=900&q=80" alt="Dumbbell rack" />
+            <img class="reveal" src="https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=900&q=80" alt="Functional training" />
+            <img class="reveal wide" src="https://images.unsplash.com/photo-1532029837206-abbe2b7620e3?auto=format&fit=crop&w=1200&q=80" alt="Boxing workout" />
+          </div>
+        </section>
+
+        <section class="cta-section" id="contact">
+          <div class="cta-bg" aria-hidden="true"></div>
+          <div class="cta-content reveal">
+            <p class="eyebrow">Ready to start?</p>
+            <h2>Book a free trial workout today.</h2>
+            <p>Visit SK Workout Zone, meet our certified trainers, check out the modern equipment, and choose the right membership package for your fitness journey.</p>
+            <div class="contact-row">
+              <a href="tel:+918619857725"><i class="fa-solid fa-phone" style="color: var(--lime); margin-right: 8px;"></i>+91 86198 57725</a>
+              <a href="https://wa.me/918619857725?text=Hello%20SK%20Workout%20Zone,%20I%20want%20to%20inquire%20about%20gym%20membership" target="_blank" style="background: rgba(37, 211, 102, 0.15); border-color: rgba(37, 211, 102, 0.4);"><i class="fa-brands fa-whatsapp" style="color: #25d366; margin-right: 8px;"></i>WhatsApp Us</a>
+              <a href="https://www.instagram.com/sk_workout_zone_2711?utm_source=qr&igsi=MWQyMnhsNjl3aTNkNw==" target="_blank" style="background: rgba(225, 48, 108, 0.15); border-color: rgba(225, 48, 108, 0.4);"><i class="fa-brands fa-instagram" style="color: #e1306c; margin-right: 8px;"></i>@sk_workout_zone_2711</a>
+              <a href="mailto:sumit271188@gmail.com"><i class="fa-solid fa-envelope" style="color: var(--blue); margin-right: 8px;"></i>sumit271188@gmail.com</a>
+              <a href="https://maps.app.goo.gl/LDyRF7d3ncYDzPhQ8" target="_blank" style="background: rgba(255, 61, 79, 0.12); border-color: rgba(255, 61, 79, 0.35);"><i class="fa-solid fa-location-dot" style="color: var(--red); margin-right: 8px;"></i>Plot no 298 mangal vihar, near laugh & learn academy, agra road, jamdoli, jaipur 302031 <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 0.72rem; margin-left: 6px;"></i></a>
+            </div>
+            <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+              <button class="join-btn" data-open-join type="button">Book Free Trial</button>
+              <a href="https://maps.app.goo.gl/LDyRF7d3ncYDzPhQ8" target="_blank" class="ghost-btn" style="min-height: 48px;"><i class="fa-solid fa-map-location-dot" style="margin-right: 8px; color: var(--lime);"></i>Get Directions on Google Maps</a>
+              <a href="https://www.instagram.com/sk_workout_zone_2711?utm_source=qr&igsi=MWQyMnhsNjl3aTNkNw==" target="_blank" class="ghost-btn" style="min-height: 48px; border-color: rgba(225, 48, 108, 0.4);"><i class="fa-brands fa-instagram" style="margin-right: 8px; color: #e1306c;"></i>Instagram Profile</a>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- ================= VIEW 2: ADMIN PORTAL (Management Dashboard) ================= -->
+      <div id="admin-portal-view" class="view-section" style="display: none;">
+        <section class="section admin-dashboard-section" style="padding-top: 130px;">
+          
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px; margin-bottom: 24px;">
+            <div class="section-head" style="margin-bottom: 0;">
+              <p class="eyebrow">Owner Management Portal</p>
+              <h2>SK Workout Zone Dashboard</h2>
+              <p>Monitor memberships, manage payments, process enquiries, and send WhatsApp reminders.</p>
+            </div>
+            <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+              <button onclick="openSupabaseModal()" class="ghost-btn" id="cloudStatusBtn" type="button" style="min-height: 40px; font-size: 0.84rem; padding: 0 14px; border-color: rgba(62, 207, 142, 0.4);">
+                <i class="fa-solid fa-cloud" style="margin-right: 6px; color: #3ecf8e;"></i> <span id="cloudStatusText">Cloud DB</span>
+              </button>
+              <button onclick="switchView('member-portal')" class="ghost-btn" type="button" style="min-height: 40px; font-size: 0.84rem; padding: 0 14px;">
+                <i class="fa-solid fa-eye" style="margin-right: 6px; color: var(--lime);"></i> View Website
+              </button>
+              <button onclick="openChangeCredentialsModal()" class="ghost-btn" type="button" style="min-height: 40px; font-size: 0.84rem; padding: 0 14px;">
+                <i class="fa-solid fa-key" style="margin-right: 6px; color: var(--amber);"></i> Change Login
+              </button>
+              <button onclick="adminLogout()" class="ghost-btn" type="button" style="min-height: 40px; font-size: 0.84rem; padding: 0 14px; border-color: rgba(255, 61, 79, 0.4); color: var(--red);">
+                <i class="fa-solid fa-right-from-bracket" style="margin-right: 6px;"></i> Logout
+              </button>
+            </div>
+          </div>
+
+          <!-- KPI Cards Grid -->
+          <div class="admin-kpis">
+            <article class="kpi-panel">
+              <div class="kpi-icon-container" style="color: var(--lime);"><i class="fa-solid fa-users"></i></div>
+              <div class="kpi-stats">
+                <span class="kpi-title">Active Members</span>
+                <strong class="kpi-val" id="kpi-active-members">0</strong>
+              </div>
+            </article>
+            <article class="kpi-panel">
+              <div class="kpi-icon-container" style="color: var(--mint);"><i class="fa-solid fa-indian-rupee-sign"></i></div>
+              <div class="kpi-stats">
+                <span class="kpi-title">Total Revenue</span>
+                <strong class="kpi-val" id="kpi-total-revenue">₹0</strong>
+              </div>
+            </article>
+            <article class="kpi-panel">
+              <div class="kpi-icon-container" style="color: var(--amber);"><i class="fa-solid fa-hourglass-half"></i></div>
+              <div class="kpi-stats">
+                <span class="kpi-title">Expiring (7 Days)</span>
+                <strong class="kpi-val" id="kpi-expiring-soon">0</strong>
+              </div>
+            </article>
+            <article class="kpi-panel">
+              <div class="kpi-icon-container" style="color: var(--red);"><i class="fa-solid fa-calendar-times"></i></div>
+              <div class="kpi-stats">
+                <span class="kpi-title">Expired Packs</span>
+                <strong class="kpi-val" id="kpi-expired">0</strong>
+              </div>
+            </article>
+          </div>
+
+          <!-- Admin Panels Grid layout -->
+          <div class="admin-layout-grid">
+            
+            <!-- Left Panel: Member Directory -->
+            <div class="admin-panel-card">
+              <div class="admin-panel-header">
+                <h3><i class="fa-solid fa-address-book" style="color: var(--lime); margin-right: 8px;"></i> Member Directory</h3>
+                <div class="admin-panel-actions">
+                  <!-- Custom Search input -->
+                  <input type="text" id="member-search" class="admin-search-input" placeholder="Search by name or phone..." oninput="filterMembers()">
+                  
+                  <!-- Filter Select dropdown -->
+                  <select id="member-filter-status" class="admin-select-input" onchange="filterMembers()">
+                    <option value="All">All Members</option>
+                    <option value="Active">Active only</option>
+                    <option value="Expiring">Expiring Soon</option>
+                    <option value="Expired">Expired only</option>
+                    <option value="Pending">Payment Pending</option>
+                  </select>
+
+                  <button class="join-btn small" onclick="openAdminRegisterModal()" type="button" style="min-height: 38px;">
+                    <i class="fa-solid fa-user-plus"></i> Add Member
+                  </button>
+                </div>
+              </div>
+
+              <!-- Directory list table -->
+              <div class="table-container">
+                <table class="dashboard-table">
+                  <thead>
+                    <tr>
+                      <th>Name / Email</th>
+                      <th>Phone</th>
+                      <th>Plan Pack</th>
+                      <th>Validity Expiration</th>
+                      <th>Status</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="members-list-body">
+                    <tr>
+                      <td colspan="6" style="text-align: center; color: var(--muted); padding: 2rem;">
+                        No members registered yet.
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Right Column Panel Widget Stack -->
+            <div class="admin-widgets-stack">
+
+              <!-- Live Gym Open / Closed / Holiday Status Manager Panel -->
+              <div class="admin-panel-card" id="gym-status-manager-panel" style="padding: 24px;">
+                <div class="admin-panel-header" style="margin-bottom: 16px;">
+                  <h3><i class="fa-solid fa-power-off" style="color: var(--lime); margin-right: 8px;"></i> Live Gym Status & Holiday Manager</h3>
+                  <span id="admin-live-status-pill" class="live-status-pill open" style="padding: 4px 10px; font-size: 0.76rem;">
+                    <span class="live-dot"></span> <span id="admin-live-status-badge">OPEN</span>
+                  </span>
+                </div>
+                <p style="font-size: 0.82rem; color: var(--muted); margin-bottom: 14px;">
+                  Gym live status set karein. "Auto" schedule par chalta hai (5-10 AM, 5-10 PM). Aap yahan se live Force OPEN ya Holiday/Closed set kar sakte hain.
+                </p>
+
+                <!-- Mode Radio Buttons -->
+                <div class="status-mode-selector" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 14px;">
+                  <button type="button" class="status-mode-btn active" id="mode-btn-auto" onclick="setGymStatusMode('auto')">
+                    <i class="fa-solid fa-clock-rotate-left"></i>
+                    <span>Auto Mode</span>
+                  </button>
+                  <button type="button" class="status-mode-btn" id="mode-btn-open" onclick="setGymStatusMode('force_open')">
+                    <i class="fa-solid fa-door-open" style="color: var(--lime);"></i>
+                    <span>Force OPEN</span>
+                  </button>
+                  <button type="button" class="status-mode-btn" id="mode-btn-holiday" onclick="setGymStatusMode('holiday')">
+                    <i class="fa-solid fa-umbrella-beach" style="color: var(--amber);"></i>
+                    <span>Holiday / Off</span>
+                  </button>
+                </div>
+
+                <!-- Holiday & Notice Controls -->
+                <div id="holiday-settings-box" style="margin-top: 10px; padding: 14px; background: rgba(0,0,0,0.25); border: 1px solid var(--line); border-radius: var(--radius-sm);">
+                  <label style="font-size: 0.8rem; color: var(--muted); display: block; margin-bottom: 6px;">1-Click Holiday Presets:</label>
+                  <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px;">
+                    <button type="button" class="preset-tag-btn" onclick="applyHolidayPreset('Holi Festival Holiday', 'Gym will remain closed today for Holi celebrations. Happy Holi to all members!')">🎉 Holi</button>
+                    <button type="button" class="preset-tag-btn" onclick="applyHolidayPreset('Diwali Festival Holiday', 'Gym will remain closed today for Diwali celebrations. Happy Diwali!')">🪔 Diwali</button>
+                    <button type="button" class="preset-tag-btn" onclick="applyHolidayPreset('Sunday Weekly Off', 'Gym is closed today for weekly Sunday rest & sanitization. Open Monday 5:00 AM.')">☀️ Sunday Off</button>
+                    <button type="button" class="preset-tag-btn" onclick="applyHolidayPreset('Equipment Maintenance', 'Gym is closed today for routine machine maintenance & deep cleaning.')">🔧 Maintenance</button>
+                    <button type="button" class="preset-tag-btn" onclick="applyHolidayPreset('Weather Alert', 'Gym is temporarily closed today due to heavy rain / weather conditions.')">🌧️ Weather</button>
+                  </div>
+
+                  <div style="display: flex; flex-direction: column; gap: 10px;">
+                    <label style="font-size: 0.82rem; font-weight: 700;">Holiday Reason / Title
+                      <input type="text" id="holiday-title-input" placeholder="E.g. Holi Special Holiday" style="margin-top: 4px;" />
+                    </label>
+                    <label style="font-size: 0.82rem; font-weight: 700;">Notice Message for Public Website
+                      <textarea id="holiday-desc-input" rows="2" placeholder="E.g. Gym will remain closed today. Enjoy your holiday!" style="margin-top: 4px; resize: none;"></textarea>
+                    </label>
+                  </div>
+                  
+                  <button type="button" class="join-btn" onclick="saveHolidayDetails()" style="width: 100%; margin-top: 12px; min-height: 40px; font-size: 0.84rem;">
+                    <i class="fa-solid fa-check"></i> Save & Publish Notice
+                  </button>
+                </div>
+              </div>
+
+              <!-- Member Celebrations Panel (Birthdays & Anniversaries) -->
+              <div class="admin-panel-card" id="celebrations-panel" style="padding: 24px;">
+                <div class="admin-panel-header" style="margin-bottom: 16px;">
+                  <h3><i class="fa-solid fa-cake-candles" style="color: var(--amber); margin-right: 8px;"></i> Celebrations & Greetings</h3>
+                  <span class="admin-badge-count" id="celebrations-badge-count" style="background: rgba(255, 179, 0, 0.18); border-color: rgba(255, 179, 0, 0.4); color: var(--amber);">0 Today</span>
+                </div>
+                
+                <!-- Tab filter for celebrations -->
+                <div style="display: flex; gap: 8px; margin-bottom: 14px;">
+                  <button type="button" class="tab-pill active" id="tab-celeb-today" onclick="switchCelebrationTab('today')" style="flex: 1; padding: 7px; font-size: 0.8rem; border-radius: 6px; font-weight: 800; cursor: pointer;">
+                    Today's Celebrations
+                  </button>
+                  <button type="button" class="tab-pill" id="tab-celeb-upcoming" onclick="switchCelebrationTab('upcoming')" style="flex: 1; padding: 7px; font-size: 0.8rem; border-radius: 6px; font-weight: 800; cursor: pointer;">
+                    Upcoming (7 Days)
+                  </button>
+                </div>
+
+                <div class="celebrations-feed" id="celebrations-feed-container">
+                  <div style="text-align: center; color: var(--muted); padding: 1.5rem; font-size: 0.88rem;">
+                    No celebrations today.
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Reminders Panel -->
+              <div class="admin-panel-card" style="padding: 24px;">
+                <div class="admin-panel-header" style="margin-bottom: 18px;">
+                  <h3><i class="fa-solid fa-bell" style="color: var(--amber); margin-right: 8px;"></i> Expiry Reminders</h3>
+                  <span class="admin-badge-count" id="reminder-count">0 Alerts</span>
+                </div>
+                <div class="reminder-list-feed" id="reminder-list-container">
+                  <div style="text-align: center; color: var(--muted); padding: 1.5rem;">
+                    No pending reminders!
+                  </div>
+                </div>
+              </div>
+
+              <!-- Leads Converter Panel -->
+              <div class="admin-panel-card" style="padding: 24px;">
+                <div class="admin-panel-header" style="margin-bottom: 18px;">
+                  <h3><i class="fa-solid fa-paper-plane" style="color: var(--blue); margin-right: 8px;"></i> Public Enquiries (Leads)</h3>
+                </div>
+                <div class="leads-list-feed" id="leads-list-container">
+                  <div style="text-align: center; color: var(--muted); padding: 1.5rem;">
+                    No new public enquiries.
+                  </div>
+                </div>
+              </div>
+
+              <!-- Pack popularity visual chart -->
+              <div class="admin-panel-card" style="padding: 24px;">
+                <div class="admin-panel-header" style="margin-bottom: 18px;">
+                  <h3><i class="fa-solid fa-chart-simple" style="color: var(--mint); margin-right: 8px;"></i> Package Popularity</h3>
+                </div>
+                <div class="bar-chart-widget">
+                  <div class="bar-chart-row">
+                    <span class="chart-lbl-left">1 Month</span>
+                    <div class="bar-chart-progress"><div id="chart-bar-1m" class="bar-fill lime" style="width: 5%;"></div></div>
+                    <span class="chart-lbl-right" id="chart-val-1m">0</span>
+                  </div>
+                  <div class="bar-chart-row">
+                    <span class="chart-lbl-left">3 Months</span>
+                    <div class="bar-chart-progress"><div id="chart-bar-3m" class="bar-fill mint" style="width: 5%;"></div></div>
+                    <span class="chart-lbl-right" id="chart-val-3m">0</span>
+                  </div>
+                  <div class="bar-chart-row">
+                    <span class="chart-lbl-left">6 Months</span>
+                    <div class="bar-chart-progress"><div id="chart-bar-6m" class="bar-fill blue" style="width: 5%;"></div></div>
+                    <span class="chart-lbl-right" id="chart-val-6m">0</span>
+                  </div>
+                  <div class="bar-chart-row">
+                    <span class="chart-lbl-left">1 Year</span>
+                    <div class="bar-chart-progress"><div id="chart-bar-12m" class="bar-fill amber" style="width: 5%;"></div></div>
+                    <span class="chart-lbl-right" id="chart-val-12m">0</span>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+
+          <!-- Billing Transaction Ledger Panel (Full Width) -->
+          <div class="admin-panel-card" style="margin-top: 24px;">
+            <div class="admin-panel-header">
+              <h3><i class="fa-solid fa-receipt" style="color: var(--mint); margin-right: 8px;"></i> Billing & Payment Transactions Ledger</h3>
+            </div>
+            <div class="table-container">
+              <table class="dashboard-table">
+                <thead>
+                  <tr>
+                    <th>Txn ID</th>
+                    <th>Transaction Date</th>
+                    <th>Member Name</th>
+                    <th>Phone</th>
+                    <th>Plan Pack</th>
+                    <th>Discount Given</th>
+                    <th>Net Amount Paid</th>
+                    <th>Type</th>
+                    <th>Receipt</th>
+                  </tr>
+                </thead>
+                <tbody id="payments-list-body">
+                  <tr>
+                    <td colspan="9" style="text-align: center; color: var(--muted); padding: 2rem;">
+                      No transactions recorded yet.
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </section>
+      </div>
+
+    </main>
+
+    <!-- ================= MODALS & DIALOG OVERLAYS ================= -->
+    
+    <!-- Modal: Secure Admin Login / Owner Access Modal -->
+    <div class="modal" id="adminLoginModal" aria-hidden="true">
+      <form class="join-form" id="adminLoginForm" onsubmit="handleAdminLogin(event)" style="max-width: 420px;">
+        <button class="modal-close" type="button" onclick="closeModal('adminLoginModal')" aria-label="Close form"></button>
+        <p class="eyebrow" style="color: var(--lime);"><i class="fa-solid fa-shield-halved"></i> Owner Access Only</p>
+        <h2>Admin Login</h2>
+        <p style="color: var(--muted); font-size: 0.88rem; margin: 8px 0 20px;">
+          This dashboard is strictly reserved for the gym owner and management staff.
+        </p>
+        
+        <div style="display: flex; flex-direction: column; gap: 14px; margin-bottom: 14px;">
+          <label>Username
+            <input type="text" id="admin-user-input" required placeholder="Enter username (Default: admin)" autocomplete="username" />
+          </label>
+          <label>Password
+            <div style="position: relative; display: flex; align-items: center; margin-top: 6px;">
+              <input type="password" id="admin-pass-input" required placeholder="Enter password (Default: 2711)" style="padding-right: 44px;" autocomplete="current-password" />
+              <button type="button" onclick="togglePinVisibility('admin-pass-input', this)" style="position: absolute; right: 10px; background: transparent; border: none; color: var(--muted); cursor: pointer; padding: 6px;">
+                <i class="fa-regular fa-eye"></i>
+              </button>
+            </div>
+          </label>
+        </div>
+
+        <!-- Remind Me / Remember Me Checkbox -->
+        <div style="margin-bottom: 20px; padding: 10px 14px; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px;">
+          <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 0.86rem; color: var(--text); user-select: none; margin: 0;">
+            <input type="checkbox" id="admin-remember-me" checked style="width: 18px; height: 18px; accent-color: var(--lime); cursor: pointer;" />
+            <span><strong>Remember Me</strong> (Iss phone/device par login yaad rakhein)</span>
+          </label>
+        </div>
+
+        <button class="join-btn" type="submit" style="width: 100%;">
+          <i class="fa-solid fa-lock-open" style="margin-right: 8px;"></i> Login to Dashboard
+        </button>
+        <p class="form-note" style="font-size: 0.74rem; text-align: center; margin-top: 14px;">Default: Username <strong>admin</strong> | Password <strong>2711</strong></p>
+      </form>
+    </div>
+
+    <!-- Modal: Change Owner Credentials Modal -->
+    <div class="modal" id="changeCredentialsModal" aria-hidden="true">
+      <form class="join-form" id="changeCredentialsForm" onsubmit="handleChangeCredentials(event)" style="max-width: 420px;">
+        <button class="modal-close" type="button" onclick="closeModal('changeCredentialsModal')" aria-label="Close form"></button>
+        <p class="eyebrow" style="color: var(--amber);"><i class="fa-solid fa-key"></i> Security Settings</p>
+        <h2>Change Login Details</h2>
+        
+        <div style="display: flex; flex-direction: column; gap: 14px; margin: 20px 0;">
+          <label>Current Password
+            <input type="password" id="current-pass-input" required placeholder="Enter current password" />
+          </label>
+          <label>New Username
+            <input type="text" id="new-user-input" required placeholder="Enter new username" minlength="3" />
+          </label>
+          <label>New Password (4+ characters)
+            <input type="password" id="new-pass-input" required placeholder="Enter new password" minlength="4" />
+          </label>
+          <label>Confirm New Password
+            <input type="password" id="confirm-pass-input" required placeholder="Re-enter new password" minlength="4" />
+          </label>
+        </div>
+
+        <button class="join-btn" type="submit" style="width: 100%; background: linear-gradient(135deg, var(--amber), var(--red));">
+          <i class="fa-solid fa-check" style="margin-right: 8px;"></i> Save New Credentials
+        </button>
+      </form>
+    </div>
+
+    <!-- Modal: Supabase Cloud Database Configuration -->
+    <div class="modal" id="supabaseConfigModal" aria-hidden="true">
+      <div class="join-form" style="max-width: 560px;">
+        <button class="modal-close" type="button" onclick="closeModal('supabaseConfigModal')" aria-label="Close form"></button>
+        <p class="eyebrow" style="color: #3ecf8e;"><i class="fa-solid fa-cloud"></i> Cloud Database</p>
+        <h2>Supabase PostgreSQL Sync</h2>
+        <p style="color: var(--muted); font-size: 0.86rem; margin: 6px 0 16px;">
+          Supabase cloud database connect karein taaki aapka gym data phone, laptop aur reception par 100% sync rahe.
+        </p>
+
+        <form id="supabaseConfigForm" onsubmit="handleSaveSupabaseConfig(event)">
+          <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 16px;">
+            <label>Supabase Project URL *
+              <input type="url" id="sb-url-input" placeholder="https://xyzproject.supabase.co" required style="margin-top: 4px;" />
+            </label>
+            <label>Supabase Anon Public API Key *
+              <input type="password" id="sb-key-input" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." required style="margin-top: 4px;" />
+            </label>
+          </div>
+
+          <div style="display: flex; gap: 10px; margin-bottom: 16px;">
+            <button type="submit" class="join-btn" style="flex: 1; background: linear-gradient(135deg, #3ecf8e, #2ba670); color: #070909; font-weight: 850;">
+              <i class="fa-solid fa-link"></i> Save & Connect
+            </button>
+            <button type="button" onclick="handleTestSupabaseConnection()" class="ghost-btn" style="min-height: 44px; padding: 0 16px;">
+              <i class="fa-solid fa-circle-nodes"></i> Test Connection
+            </button>
+          </div>
+        </form>
+
+        <div style="border-top: 1px solid var(--line); padding-top: 14px; margin-top: 14px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <strong style="font-size: 0.85rem; color: var(--text);"><i class="fa-solid fa-database" style="color: #3ecf8e; margin-right: 6px;"></i> Step 1: SQL Setup Script</strong>
+            <button type="button" onclick="copySupabaseSQL()" class="ghost-btn" style="padding: 4px 10px; font-size: 0.76rem; min-height: 28px;">
+              <i class="fa-solid fa-copy"></i> Copy SQL
+            </button>
+          </div>
+          <p style="font-size: 0.78rem; color: var(--muted); margin-bottom: 8px;">
+            Supabase.com par login karein &rarr; Apne project ke <strong>SQL Editor</strong> me jakar is script ko paste karke <strong>Run</strong> karein (10 seconds lagte hain).
+          </p>
+          <textarea id="supabase-sql-code" readonly rows="4" style="width: 100%; font-family: monospace; font-size: 0.76rem; background: rgba(0,0,0,0.4); border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 8px; color: #a1a1aa; resize: none;"></textarea>
+
+          <div style="margin-top: 14px; display: flex; justify-content: space-between; align-items: center; background: rgba(62, 207, 142, 0.08); padding: 10px 12px; border-radius: var(--radius-sm); border: 1px solid rgba(62, 207, 142, 0.2); gap: 10px; flex-wrap: wrap;">
+            <div>
+              <div style="font-size: 0.82rem; font-weight: 700; color: #3ecf8e;">Upload Local Data to Cloud</div>
+              <div style="font-size: 0.74rem; color: var(--muted);">Push existing members & payments to Supabase.</div>
+            </div>
+            <button type="button" onclick="migrateLocalDataToSupabase()" class="ghost-btn" style="padding: 6px 14px; font-size: 0.8rem; border-color: rgba(62, 207, 142, 0.5); color: #3ecf8e;">
+              <i class="fa-solid fa-cloud-arrow-up"></i> Sync to Cloud
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: Public Leads Enquiry Join Form (Codex UI preserved) -->
+    <div class="modal" id="joinModal" aria-hidden="true">
+      <form class="join-form" id="joinForm">
+        <button class="modal-close" type="button" data-close-join aria-label="Close form"></button>
+        <p class="eyebrow">Join SK Workout Zone</p>
+        <h2>Start your transformation</h2>
+        <div class="form-grid">
+          <label>Name<input name="name" required placeholder="Your name" /></label>
+          <label>Mobile<input name="mobile" required placeholder="10 digit mobile" /></label>
+          <label>Goal<select name="goal"><option>Fat loss</option><option>Muscle gain</option><option>General fitness</option><option>Personal training</option></select></label>
+          <label>Package<select name="package" id="join-form-package"><option value="1">1 Month Pack (₹1,000)</option><option value="3" selected>3 Month Pack (₹2,500)</option><option value="6">6 Month Pack (₹4,500)</option><option value="12">1 Year Pack (₹8,000)</option></select></label>
+        </div>
+        <button class="join-btn" type="submit">Send Enquiry</button>
+        <p class="form-note" id="formNote">We will call you back with timing and joining details.</p>
+      </form>
+    </div>
+
+    <!-- Modal: Admin Dashboard Member Registration Form -->
+    <div class="modal" id="adminRegModal" aria-hidden="true">
+      <form class="join-form" id="adminRegForm" onsubmit="handleAdminRegistration(event)">
+        <button class="modal-close" type="button" onclick="closeModal('adminRegModal')" aria-label="Close form"></button>
+        <p class="eyebrow">Admin Panel</p>
+        <h2>Register New Member</h2>
+        
+        <div class="form-grid">
+          <label>Full Name *<input type="text" id="reg-name" required placeholder="E.g. Rajesh Kumar" /></label>
+          <label>Mobile * (10 digits)<input type="tel" id="reg-phone" pattern="[0-9]{10}" required placeholder="E.g. 9876543210" /></label>
+          <label>Email Address<input type="email" id="reg-email" placeholder="E.g. rajesh@gmail.com" /></label>
+          <label>Membership Pack *
+            <select id="reg-pack" onchange="updateCalcFields()" required>
+              <option value="1">1 Month Pack (₹1,000)</option>
+              <option value="3" selected>3 Month Pack (₹2,500)</option>
+              <option value="6">6 Month Pack (₹4,500)</option>
+              <option value="12">1 Year Pack (₹8,000)</option>
+            </select>
+          </label>
+          <label>Start Date *<input type="date" id="reg-date" required /></label>
+          <label>Payment Status *
+            <select id="reg-status" required>
+              <option value="Paid">Paid (Full Amount)</option>
+              <option value="Pending">Pending / Unpaid</option>
+            </select>
+          </label>
+          <label>Date of Birth (Birthday) 🎂
+            <input type="date" id="reg-dob" />
+          </label>
+          <label>Marriage Anniversary (Optional) 💍
+            <input type="date" id="reg-anniversary" />
+          </label>
+          <label>Discount Amount (₹)<input type="number" id="reg-discount" value="0" min="0" oninput="updateCalcFields()" /></label>
+        </div>
+
+        <!-- Calculated Prices Overview -->
+        <div class="estimated-summary-box">
+          <div class="est-row">
+            <span class="est-lbl">Base Price:</span>
+            <span class="est-val" id="calc-base-price">₹2,500</span>
+          </div>
+          <div class="est-row" id="calc-discount-row" style="display: none;">
+            <span class="est-lbl" style="color: var(--red);">Discount Applied:</span>
+            <span class="est-val" id="calc-discount-val" style="color: var(--red);">-₹0</span>
+          </div>
+          <div class="est-row main-total">
+            <span class="est-lbl">Total Billing Net Amount:</span>
+            <span class="est-val" id="calc-total-price" style="color: var(--lime);">₹2,500</span>
+          </div>
+        </div>
+
+        <button class="join-btn" type="submit" style="width: 100%; margin-top: 18px;">
+          <i class="fa-solid fa-check"></i> Register & Generate Receipt
+        </button>
+      </form>
+    </div>
+
+    <!-- Modal: Renewal / Add Payment Modal -->
+    <div class="modal" id="payModal" aria-hidden="true">
+      <form class="join-form" id="renewalForm" onsubmit="handleRenewMember(event)">
+        <button class="modal-close" type="button" onclick="closeModal('payModal')" aria-label="Close form"></button>
+        <p class="eyebrow" style="color: var(--mint);">Billing & Renewal</p>
+        <h2>Renew Membership</h2>
+        
+        <input type="hidden" id="pay-member-id">
+        <div class="form-grid" style="margin-bottom: 12px;">
+          <label class="full-grid-span">Member Name<input type="text" id="pay-member-name" readonly style="opacity: 0.65; background: rgba(0,0,0,0.2);" /></label>
+          <label>Renew Pack Pack *
+            <select id="pay-pack" onchange="updatePayAmount()" required>
+              <option value="1">1 Month Pack (₹1,000)</option>
+              <option value="3">3 Month Pack (₹2,500)</option>
+              <option value="6">6 Month Pack (₹4,500)</option>
+              <option value="12">1 Year Pack (₹8,000)</option>
+            </select>
+          </label>
+          <label>Discount Amount (₹)<input type="number" id="pay-discount" value="0" min="0" oninput="updatePayAmount()" required /></label>
+          <label class="full-grid-span">Start Date of New Plan *<input type="date" id="pay-start-date" required /></label>
+        </div>
+
+        <div class="estimated-summary-box">
+          <div class="est-row">
+            <span class="est-lbl">Base Price:</span>
+            <span class="est-val" id="pay-base-price">₹0</span>
+          </div>
+          <div class="est-row" id="pay-discount-row" style="display: none;">
+            <span class="est-lbl" style="color: var(--red);">Discount Applied:</span>
+            <span class="est-val" id="pay-discount-val" style="color: var(--red);">-₹0</span>
+          </div>
+          <div class="est-row main-total">
+            <span class="est-lbl">Net Payable Amount:</span>
+            <span class="est-val" id="pay-amount" style="color: var(--mint);">₹0</span>
+          </div>
+        </div>
+
+        <button class="join-btn" type="submit" style="width: 100%; margin-top: 18px; background: linear-gradient(135deg, var(--mint), var(--blue)); box-shadow: 0 14px 36px rgba(33, 216, 138, 0.2);">
+          <i class="fa-solid fa-wallet"></i> Submit Payment / Renew
+        </button>
+      </form>
+    </div>
+
+    <!-- Modal: Edit Profile Modal -->
+    <div class="modal" id="editModal" aria-hidden="true">
+      <form class="join-form" id="editForm" onsubmit="handleEditMember(event)">
+        <button class="modal-close" type="button" onclick="closeModal('editModal')" aria-label="Close form"></button>
+        <p class="eyebrow" style="color: var(--blue);">Profile Manager</p>
+        <h2>Edit Member Profile</h2>
+        
+        <input type="hidden" id="edit-member-id">
+        <div class="form-grid">
+          <label class="full-grid-span">Full Name *<input type="text" id="edit-name" required /></label>
+          <label>Mobile Number * (10 digits)<input type="tel" id="edit-phone" pattern="[0-9]{10}" required /></label>
+          <label>Email Address<input type="email" id="edit-email" /></label>
+          <label>Date of Birth (Birthday) 🎂<input type="date" id="edit-dob" /></label>
+          <label>Marriage Anniversary (Optional) 💍<input type="date" id="edit-anniversary" /></label>
+        </div>
+
+        <button class="join-btn" type="submit" style="width: 100%; margin-top: 18px; background: linear-gradient(135deg, var(--blue), var(--lime)); box-shadow: 0 14px 36px rgba(85, 199, 255, 0.2);">
+          <i class="fa-solid fa-floppy-disk"></i> Save Changes
+        </button>
+      </form>
+    </div>
+
+    <!-- Modal: Expiry Reminder message template viewer -->
+    <div class="modal" id="remindModal" aria-hidden="true">
+      <div class="join-form">
+        <button class="modal-close" type="button" onclick="closeModal('remindModal')" aria-label="Close"></button>
+        <p class="eyebrow" style="color: var(--amber);">Expiry Alerts</p>
+        <h2>WhatsApp Reminder</h2>
+        
+        <div style="margin: 18px 0;">
+          <textarea id="reminder-msg-text" readonly style="width:100%; height:140px; background: rgba(0,0,0,0.3); border:1px solid var(--line); border-radius: var(--radius); padding:12px; color: var(--text); font-family: monospace; font-size: 0.9rem; resize: none;"></textarea>
+        </div>
+
+        <div style="display: flex; gap: 12px;">
+          <button class="ghost-btn" style="flex: 1; min-height: 48px;" onclick="copyReminderText()">
+            <i class="fa-solid fa-copy"></i> Copy Message
+          </button>
+          <a id="reminder-whatsapp-link" href="#" target="_blank" class="join-btn" style="flex: 1; text-decoration: none; min-height: 48px; background: linear-gradient(135deg, #25d366, #20ba5a); box-shadow: 0 14px 36px rgba(37, 211, 102, 0.2); color: #fff;">
+            <i class="fa-brands fa-whatsapp"></i> Send WhatsApp
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: Thermal Receipt Preview Modal -->
+    <div class="modal" id="receiptModal" aria-hidden="true">
+      <div class="join-form" style="max-width: 440px;">
+        <button class="modal-close" type="button" onclick="closeModal('receiptModal')" aria-label="Close"></button>
+        <p class="eyebrow" style="color: var(--lime);">Invoicing</p>
+        <h2>Thermal Receipt</h2>
+        
+        <!-- Receipt Printing Area -->
+        <div id="receipt-print-area" class="thermal-receipt">
+          <div class="receipt-header">
+            <img src="logo.png" alt="SK Workout Zone" style="width: 48px; height: 48px; object-fit: contain; margin-bottom: 4px; border-radius: 50%;">
+            <strong class="receipt-title">SK WORKOUT ZONE</strong>
+            <div class="receipt-sub" style="font-weight: 700; color: #111;">UNISEX GYM</div>
+            <div class="receipt-sub">Plot No. 298, Mangal Vihar, Agra Road, Jamdoli, Jaipur 302031</div>
+            <div class="receipt-sub">Ph / WhatsApp: +91 86198 57725</div>
+            <div class="receipt-time" id="receipt-time">09-Jul-2026 21:30</div>
+          </div>
+          
+          <div class="receipt-divider"></div>
+          
+          <div class="receipt-row">
+            <span>Txn ID:</span>
+            <span id="receipt-txn-id" style="font-weight: 700;">TXN00000</span>
+          </div>
+          <div class="receipt-row">
+            <span>Txn Date:</span>
+            <span id="receipt-date">15-Jul-2026</span>
+          </div>
+          
+          <div class="receipt-divider"></div>
+          
+          <div class="receipt-row">
+            <span>Member:</span>
+            <span id="receipt-member-name" style="font-weight: 700;">Rajesh Kumar</span>
+          </div>
+          <div class="receipt-row">
+            <span>Mobile:</span>
+            <span id="receipt-member-phone">9876543210</span>
+          </div>
+          
+          <div class="receipt-divider"></div>
+          
+          <div class="receipt-row">
+            <span>Item:</span>
+            <span id="receipt-item-name" style="font-weight: 700;">3 Months Pack Gym Fee</span>
+          </div>
+          <div class="receipt-row">
+            <span>Validity:</span>
+            <span id="receipt-item-validity" style="font-size: 0.8rem;">15-Jul-2026 to 12-Oct-2026</span>
+          </div>
+          
+          <div class="receipt-divider"></div>
+          
+          <div class="receipt-row">
+            <span>Base Price:</span>
+            <span id="receipt-subtotal-val">₹2,500</span>
+          </div>
+          <div class="receipt-row" id="receipt-discount-row" style="display: none;">
+            <span>Discount Applied:</span>
+            <span id="receipt-discount-val" style="color: #ff3d4f;">-₹500</span>
+          </div>
+          
+          <div class="receipt-divider" style="border-top: 1px dashed #000;"></div>
+          
+          <div class="receipt-row receipt-total">
+            <span>Net Paid Amount:</span>
+            <span id="receipt-total-val" style="font-size: 1.15rem; font-weight: 900;">₹2,000</span>
+          </div>
+          
+          <div class="receipt-row">
+            <span>Payment Status:</span>
+            <span style="font-weight: 700; color: #21d88a;">PAID</span>
+          </div>
+          
+          <div class="receipt-footer">
+            <div>Thank you for training with us!</div>
+            <div style="font-weight: 700; margin-top: 4px;">NO PAIN NO GAIN! 💪</div>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 12px; margin-top: 18px;">
+          <button class="ghost-btn" style="flex: 1; min-height: 48px;" onclick="closeModal('receiptModal')">Close</button>
+          <a id="receipt-whatsapp-btn" href="#" target="_blank" class="join-btn" style="flex: 1; text-decoration: none; min-height: 48px; background: linear-gradient(135deg, #25d366, #20ba5a); box-shadow: 0 14px 36px rgba(37, 211, 102, 0.2); color: #fff;">
+            <i class="fa-brands fa-whatsapp"></i> Send on WhatsApp
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dynamic Toast Notification Container -->
+    <div id="toast-container" class="toast-notifications-box"></div>
+
+    <!-- Footer Section -->
+    <footer style="border-top: 1px solid var(--line); background: rgba(7, 9, 9, 0.5); padding: 40px 0; margin-top: 80px; position: relative; z-index: 1;">
+      <div style="width: min(1180px, calc(100% - 36px)); margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px; color: var(--muted); font-size: 0.88rem; font-weight: 800;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <img src="logo.png" alt="SK Workout Zone" style="width: 32px; height: 32px; border-radius: 50%; object-fit: contain;" />
+          <span>&copy; 2026 SK Workout Zone (Unisex Gym). All Rights Reserved.</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 16px;">
+          <a href="https://www.instagram.com/sk_workout_zone_2711?utm_source=qr&igsi=MWQyMnhsNjl3aTNkNw==" target="_blank" style="color: #e1306c; display: inline-flex; align-items: center; gap: 6px; text-decoration: none;" title="Instagram">
+            <i class="fa-brands fa-instagram" style="font-size: 1.15rem;"></i> Instagram
+          </a>
+          <a href="https://wa.me/918619857725" target="_blank" style="color: #25d366; display: inline-flex; align-items: center; gap: 6px; text-decoration: none;" title="WhatsApp">
+            <i class="fa-brands fa-whatsapp" style="font-size: 1.15rem;"></i> WhatsApp
+          </a>
+          <a href="javascript:void(0)" onclick="openAdminLoginModal()" style="color: var(--muted); font-size: 0.8rem; display: inline-flex; align-items: center; gap: 5px; opacity: 0.55; text-decoration: none;" title="Gym Owner / Management Access">
+            <i class="fa-solid fa-lock"></i> Owner
+          </a>
+        </div>
+        <div>Plot No. 298, Mangal Vihar, Agra Road, Jamdoli, Jaipur | Ph: +91 86198 57725</div>
+      </div>
+    </footer>
+
+    <!-- Supabase Cloud Database Client & Service -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-service.js"></script>
+
+    <!-- App Logic Script -->
+    <script src="app.js"></script>
+  </body>
+</html>
