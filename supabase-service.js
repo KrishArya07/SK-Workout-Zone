@@ -81,10 +81,16 @@ NOTIFY pgrst, 'reload schema';
 
 let supabaseClient = null;
 
+// Official SK Workout Zone Cloud Project Credentials
+const DEFAULT_SUPABASE_URL = "https://aqnkyvvwaiitoztdedvf.supabase.co";
+const DEFAULT_SUPABASE_KEY = "sb_publishable_LOB1brUNIre_v3lH-BUpTg_9eX4eN5f";
+
 function getSupabaseConfig() {
+    const savedUrl = localStorage.getItem('sk_supabase_url');
+    const savedKey = localStorage.getItem('sk_supabase_key');
     return {
-        url: (localStorage.getItem('sk_supabase_url') || '').trim(),
-        key: (localStorage.getItem('sk_supabase_key') || '').trim()
+        url: (savedUrl || DEFAULT_SUPABASE_URL).trim(),
+        key: (savedKey || DEFAULT_SUPABASE_KEY).trim()
     };
 }
 
@@ -98,7 +104,7 @@ function initSupabase() {
     if (isSupabaseConfigured() && window.supabase && typeof window.supabase.createClient === 'function') {
         try {
             supabaseClient = window.supabase.createClient(config.url, config.key);
-            console.log("⚡ Supabase Client initialized successfully.");
+            console.log("⚡ Supabase Client initialized successfully with project:", config.url);
             updateCloudStatusUI(true);
             return true;
         } catch (err) {
@@ -167,12 +173,22 @@ async function dbFetchMembers() {
             name: m.name,
             phone: m.phone,
             email: m.email || '',
+            gender: m.gender || 'Male',
             dob: m.dob || '',
             anniversary: m.anniversary || '',
-            planPack: m.plan_pack,
-            startDate: m.start_date,
-            endDate: m.end_date,
-            paymentStatus: m.payment_status,
+            planPack: String(m.plan || '1'),
+            startDate: m.startdate,
+            endDate: m.expirydate,
+            paymentStatus: m.status || 'Paid',
+            amount: Number(m.amount || 0),
+            discount: Number(m.discount || 0),
+            finalAmount: Number(m.finalamount || 0),
+            paid: Number(m.paid || 0),
+            due: Number(m.due || 0),
+            address: m.address || '',
+            bloodGroup: m.bloodgroup || '',
+            emergencyContact: m.emergencycontact || '',
+            paymentMode: m.paymentmode || 'Cash',
             createdAt: m.created_at
         }));
     } catch (e) {
@@ -189,13 +205,22 @@ async function dbSaveMember(member) {
             id: member.id,
             name: member.name,
             phone: member.phone,
-            email: member.email || '',
+            gender: member.gender || 'Male',
+            plan: String(member.planPack || member.plan || '1'),
+            startdate: member.startDate || member.startdate,
+            expirydate: member.endDate || member.expirydate,
+            status: member.paymentStatus || member.status || 'Active',
+            amount: Number(member.amount || 0),
+            discount: Number(member.discount || 0),
+            finalamount: Number(member.finalAmount || member.amount || 0),
+            paid: Number(member.paid || member.amount || 0),
+            due: Number(member.due || 0),
             dob: member.dob || '',
             anniversary: member.anniversary || '',
-            plan_pack: member.planPack,
-            start_date: member.startDate,
-            end_date: member.endDate,
-            payment_status: member.paymentStatus,
+            address: member.address || '',
+            bloodgroup: member.bloodGroup || '',
+            emergencycontact: member.emergencyContact || '',
+            paymentmode: member.paymentMode || 'Cash',
             created_at: member.createdAt || new Date().toISOString()
         };
         const { error } = await supabaseClient.from('members').upsert(row);
@@ -234,14 +259,15 @@ async function dbFetchPayments() {
         }
         return data.map(p => ({
             id: p.id,
-            memberId: p.member_id,
-            memberName: p.member_name,
-            memberPhone: p.member_phone,
-            planPack: p.plan_pack,
-            amount: Number(p.amount),
+            memberId: p.memberid,
+            memberName: p.membername,
+            memberPhone: p.memberphone || '',
+            planPack: String(p.planpack || '1'),
+            amount: Number(p.amount || 0),
             discount: Number(p.discount || 0),
-            paymentDate: p.payment_date,
+            paymentDate: p.date,
             type: p.type || 'Registration',
+            mode: p.mode || 'Cash',
             createdAt: p.created_at
         }));
     } catch (e) {
@@ -256,15 +282,13 @@ async function dbSavePayment(payment) {
     try {
         const row = {
             id: payment.id,
-            member_id: payment.memberId,
-            member_name: payment.memberName,
-            member_phone: payment.memberPhone,
-            plan_pack: payment.planPack,
-            amount: payment.amount,
-            discount: payment.discount || 0,
-            payment_date: payment.paymentDate,
-            type: payment.type || 'Registration',
-            created_at: new Date().toISOString()
+            memberid: payment.memberId || payment.memberid,
+            membername: payment.memberName || payment.membername,
+            amount: Number(payment.amount || 0),
+            date: payment.paymentDate || payment.date,
+            type: payment.type || 'New Registration',
+            mode: payment.mode || 'Cash',
+            created_at: payment.createdAt || new Date().toISOString()
         };
         const { error } = await supabaseClient.from('payments').upsert(row);
         if (error) throw error;
@@ -287,9 +311,10 @@ async function dbFetchLeads() {
         return data.map(l => ({
             id: l.id,
             name: l.name,
-            mobile: l.mobile,
-            goal: l.goal,
-            package: l.package,
+            mobile: l.phone,
+            goal: l.interest || '',
+            package: l.interest || '',
+            status: l.status || 'New',
             createdAt: l.created_at
         }));
     } catch (e) {
@@ -304,9 +329,10 @@ async function dbSaveLead(lead) {
         const row = {
             id: lead.id || `LEAD-${Date.now().toString().slice(-4)}`,
             name: lead.name,
-            mobile: lead.mobile,
-            goal: lead.goal,
-            package: lead.package,
+            phone: lead.mobile || lead.phone,
+            interest: lead.goal || lead.interest || lead.package || '',
+            date: lead.createdAt ? lead.createdAt.slice(0, 10) : new Date().toISOString().slice(0, 10),
+            status: lead.status || 'New',
             created_at: lead.createdAt || new Date().toISOString()
         };
         const { error } = await supabaseClient.from('enquiries').upsert(row);
@@ -322,7 +348,7 @@ async function dbSaveLead(lead) {
 async function dbDeleteLead(phoneOrId) {
     if (!supabaseClient) return false;
     try {
-        await supabaseClient.from('enquiries').delete().or(`id.eq.${phoneOrId},mobile.eq.${phoneOrId}`);
+        await supabaseClient.from('enquiries').delete().or(`id.eq.${phoneOrId},phone.eq.${phoneOrId}`);
         return true;
     } catch (e) {
         return false;

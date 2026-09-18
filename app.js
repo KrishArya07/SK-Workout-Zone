@@ -505,6 +505,24 @@ async function fetchCloudState() {
     }
 }
 
+// Auto-sync whenever user returns to the tab or app
+window.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible' && typeof fetchCloudState === 'function') {
+        fetchCloudState();
+    }
+});
+window.addEventListener('focus', () => {
+    if (typeof fetchCloudState === 'function') {
+        fetchCloudState();
+    }
+});
+// Periodic background sync every 25 seconds
+setInterval(() => {
+    if (typeof fetchCloudState === 'function' && typeof isSupabaseConfigured === 'function' && isSupabaseConfigured()) {
+        fetchCloudState();
+    }
+}, 25000);
+
 function saveState() {
     localStorage.setItem('sk_members', JSON.stringify(state.members));
     localStorage.setItem('sk_payments', JSON.stringify(state.payments));
