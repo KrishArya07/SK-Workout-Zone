@@ -67,6 +67,13 @@ CREATE POLICY "Allow all access to members" ON members FOR ALL USING (true) WITH
 CREATE POLICY "Allow all access to payments" ON payments FOR ALL USING (true) WITH CHECK (true);
 CREATE POLICY "Allow all access to enquiries" ON enquiries FOR ALL USING (true) WITH CHECK (true);
 CREATE POLICY "Allow all access to gym_settings" ON gym_settings FOR ALL USING (true) WITH CHECK (true);
+
+-- Grant schema and table access to anon and authenticated roles
+GRANT USAGE ON SCHEMA public TO anon, authenticated;
+GRANT ALL ON ALL TABLES IN SCHEMA public TO anon, authenticated;
+GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO anon, authenticated;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON SEQUENCES TO anon, authenticated;
 `;
 
 let supabaseClient = null;
