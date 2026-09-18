@@ -53,27 +53,30 @@ CREATE TABLE IF NOT EXISTS gym_settings (
 );
 
 -- Enable Row Level Security (RLS) with open read/write for anon API key
-ALTER TABLE members ENABLE ROW LEVEL SECURITY;
-ALTER TABLE payments ENABLE ROW LEVEL SECURITY;
-ALTER TABLE enquiries ENABLE ROW LEVEL SECURITY;
-ALTER TABLE gym_settings ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.members ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.payments ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.enquiries ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.gym_settings ENABLE ROW LEVEL SECURITY;
 
-DROP POLICY IF EXISTS "Allow all access to members" ON members;
-DROP POLICY IF EXISTS "Allow all access to payments" ON payments;
-DROP POLICY IF EXISTS "Allow all access to enquiries" ON enquiries;
-DROP POLICY IF EXISTS "Allow all access to gym_settings" ON gym_settings;
+DROP POLICY IF EXISTS "Allow all access to members" ON public.members;
+DROP POLICY IF EXISTS "Allow all access to payments" ON public.payments;
+DROP POLICY IF EXISTS "Allow all access to enquiries" ON public.enquiries;
+DROP POLICY IF EXISTS "Allow all access to gym_settings" ON public.gym_settings;
 
-CREATE POLICY "Allow all access to members" ON members FOR ALL USING (true) WITH CHECK (true);
-CREATE POLICY "Allow all access to payments" ON payments FOR ALL USING (true) WITH CHECK (true);
-CREATE POLICY "Allow all access to enquiries" ON enquiries FOR ALL USING (true) WITH CHECK (true);
-CREATE POLICY "Allow all access to gym_settings" ON gym_settings FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Allow all access to members" ON public.members FOR ALL TO anon, authenticated USING (true) WITH CHECK (true);
+CREATE POLICY "Allow all access to payments" ON public.payments FOR ALL TO anon, authenticated USING (true) WITH CHECK (true);
+CREATE POLICY "Allow all access to enquiries" ON public.enquiries FOR ALL TO anon, authenticated USING (true) WITH CHECK (true);
+CREATE POLICY "Allow all access to gym_settings" ON public.gym_settings FOR ALL TO anon, authenticated USING (true) WITH CHECK (true);
 
--- Grant schema and table access to anon and authenticated roles
+-- Grant table level privileges to anon and authenticated roles
 GRANT USAGE ON SCHEMA public TO anon, authenticated;
-GRANT ALL ON ALL TABLES IN SCHEMA public TO anon, authenticated;
-GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;
-ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO anon, authenticated;
-ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON SEQUENCES TO anon, authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE public.members TO anon, authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE public.payments TO anon, authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE public.enquiries TO anon, authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE public.gym_settings TO anon, authenticated;
+
+-- Reload Supabase API cache
+NOTIFY pgrst, 'reload schema';
 `;
 
 let supabaseClient = null;
