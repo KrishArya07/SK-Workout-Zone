@@ -411,10 +411,22 @@ async function loadState() {
     const storedMembers = localStorage.getItem('sk_members');
     const storedPayments = localStorage.getItem('sk_payments');
     
+    let needsSeed = true;
     if (storedMembers && storedPayments) {
-        state.members = JSON.parse(storedMembers);
-        state.payments = JSON.parse(storedPayments);
-    } else {
+        try {
+            const parsedM = JSON.parse(storedMembers);
+            const parsedP = JSON.parse(storedPayments);
+            if (Array.isArray(parsedM) && parsedM.length > 0) {
+                state.members = parsedM;
+                state.payments = Array.isArray(parsedP) ? parsedP : [];
+                needsSeed = false;
+            }
+        } catch (e) {
+            console.warn("Local storage parse error:", e);
+        }
+    }
+    
+    if (needsSeed) {
         seedDemoData();
     }
 
@@ -422,18 +434,25 @@ async function loadState() {
     if (typeof initSupabase === 'function') {
         const isReady = initSupabase();
         if (isReady) {
-            fetchCloudState();
+            await fetchCloudState();
         }
     }
+    
+    refreshAdminDashboard();
+    renderCelebrationsWidget();
+    renderLeadsList();
 }
 
 async function fetchCloudState() {
     try {
+        let hasCloudData = false;
+
         if (typeof dbFetchMembers === 'function') {
             const cloudMembers = await dbFetchMembers();
             if (cloudMembers && cloudMembers.length > 0) {
                 state.members = cloudMembers;
                 localStorage.setItem('sk_members', JSON.stringify(state.members));
+                hasCloudData = true;
             }
         }
 
@@ -442,6 +461,22 @@ async function fetchCloudState() {
             if (cloudPayments && cloudPayments.length > 0) {
                 state.payments = cloudPayments;
                 localStorage.setItem('sk_payments', JSON.stringify(state.payments));
+                hasCloudData = true;
+            }
+        }
+
+        // If cloud database is empty, auto-push local seeded data to cloud
+        if (!hasCloudData && state.members && state.members.length > 0) {
+            console.log("Empty cloud database detected. Auto-uploading initial member records to Supabase...");
+            for (const m of state.members) {
+                await dbSaveMember(m);
+            }
+            for (const p of state.payments) {
+                await dbSavePayment(p);
+            }
+            const leads = JSON.parse(localStorage.getItem("sk-fitness-leads") || "[]");
+            for (const l of leads) {
+                await dbSaveLead(l);
             }
         }
 
@@ -558,6 +593,12 @@ function seedDemoData() {
     const subDays = (d, days) => {
         const date = new Date(d);
         date.setDate(date.getDate() - days);
+        return getLocalDateString(date);
+    };
+
+    const addDays = (d, days) => {
+        const date = new Date(d);
+        date.setDate(date.getDate() + days);
         return getLocalDateString(date);
     };
 

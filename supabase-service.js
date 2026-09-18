@@ -367,6 +367,13 @@ async function migrateLocalDataToSupabase() {
         showToast("Supabase not connected. Please enter URL and Key first.", "danger");
         return;
     }
+
+    // If local state is empty, seed demo members first so cloud gets populated
+    if (!state.members || state.members.length === 0) {
+        if (typeof seedDemoData === 'function') {
+            seedDemoData();
+        }
+    }
     
     showToast("Starting cloud data migration...", "warning");
     let memberCount = 0;
@@ -396,6 +403,10 @@ async function migrateLocalDataToSupabase() {
         title: localStorage.getItem('sk_holiday_title') || 'Sunday Weekly Off',
         desc: localStorage.getItem('sk_holiday_desc') || 'Gym is closed today.'
     });
+
+    if (typeof refreshAdminDashboard === 'function') refreshAdminDashboard();
+    if (typeof renderCelebrationsWidget === 'function') renderCelebrationsWidget();
+    if (typeof renderLeadsList === 'function') renderLeadsList();
 
     showToast(`Successfully synced ${memberCount} members and ${paymentCount} payments to Supabase!`, "success");
     closeModal('supabaseConfigModal');
