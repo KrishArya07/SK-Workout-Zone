@@ -667,8 +667,77 @@
         <button class="join-btn" type="submit" style="width: 100%;">
           <i class="fa-solid fa-lock-open" style="margin-right: 8px;"></i> Login to Dashboard
         </button>
-        <p class="form-note" style="font-size: 0.74rem; text-align: center; margin-top: 14px;">Default: Username <strong>admin</strong> | Password <strong>2711</strong></p>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 14px; padding-top: 10px; border-top: 1px solid rgba(255, 255, 255, 0.08);">
+          <button type="button" onclick="openForgotPasswordModal()" style="background: none; border: none; color: var(--lime); font-size: 0.82rem; cursor: pointer; text-decoration: underline; padding: 0;">
+            <i class="fa-solid fa-key" style="margin-right: 4px;"></i> Forgot Password? (पासवर्ड भूल गए?)
+          </button>
+          <span style="font-size: 0.74rem; color: var(--muted);">Default: admin / 2711</span>
+        </div>
       </form>
+    </div>
+
+    <!-- Modal: Forgot / Reset Admin Password via WhatsApp OTP -->
+    <div class="modal" id="forgotPasswordModal" aria-hidden="true">
+      <div class="join-form" style="max-width: 440px;">
+        <button class="modal-close" type="button" onclick="closeModal('forgotPasswordModal')" aria-label="Close form"></button>
+        <p class="eyebrow" style="color: var(--amber);"><i class="fa-solid fa-shield-halved"></i> Owner Security Recovery</p>
+        <h2>Reset Admin Password</h2>
+        <p style="color: var(--muted); font-size: 0.86rem; margin: 6px 0 16px;">
+          Gym owner ke registered mobile number par 6-digit WhatsApp OTP bheja jayega.
+        </p>
+
+        <!-- Step 1: Mobile & Send OTP -->
+        <form id="sendOtpForm" onsubmit="handleSendResetOtp(event)">
+          <div style="margin-bottom: 16px;">
+            <label>Registered Owner Mobile Number *
+              <input type="tel" id="reset-phone-input" required placeholder="Enter owner mobile (e.g. 8619857725)" maxlength="10" value="8619857725" style="margin-top: 4px;" />
+            </label>
+          </div>
+          <button class="join-btn" type="submit" id="btnSendOtp" style="width: 100%; background: linear-gradient(135deg, #25D366, #128C7E); color: #fff; font-weight: 800;">
+            <i class="fa-brands fa-whatsapp" style="margin-right: 8px; font-size: 1.1rem;"></i> Send WhatsApp OTP
+          </button>
+        </form>
+
+        <!-- Step 2: OTP Verification & New Password Setup (Hidden initially) -->
+        <form id="verifyOtpForm" onsubmit="handleVerifyOtpAndReset(event)" style="display: none; margin-top: 20px; border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 18px;">
+          <div id="otpNoticeBanner" style="padding: 10px 12px; background: rgba(37, 211, 102, 0.12); border: 1px solid rgba(37, 211, 102, 0.35); border-radius: 8px; margin-bottom: 14px; font-size: 0.82rem; color: #e0e0e0;">
+            <i class="fa-solid fa-circle-check" style="color: #25D366; margin-right: 6px;"></i> OTP sent to WhatsApp number <strong id="otpTargetPhone">8619857725</strong>.
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 14px; margin-bottom: 18px;">
+            <label>Enter 6-Digit OTP *
+              <div style="display: flex; gap: 8px; align-items: center; margin-top: 4px;">
+                <input type="text" id="reset-otp-input" required placeholder="------" maxlength="6" style="letter-spacing: 6px; font-size: 1.25rem; font-weight: 800; text-align: center;" />
+                <button type="button" id="btnResendOtp" onclick="handleResendOtp()" style="white-space: nowrap; padding: 10px 12px; font-size: 0.78rem; border-radius: 6px; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.2); color: var(--text); cursor: pointer;" disabled>
+                  Resend (60s)
+                </button>
+              </div>
+            </label>
+
+            <label>New Admin Username
+              <input type="text" id="reset-user-input" required placeholder="Enter username" minlength="3" value="admin" style="margin-top: 4px;" />
+            </label>
+
+            <label>New Password (4+ digits/letters)
+              <div style="position: relative; display: flex; align-items: center; margin-top: 4px;">
+                <input type="password" id="reset-pass-input" required placeholder="Enter new password" minlength="4" style="padding-right: 44px;" />
+                <button type="button" onclick="togglePinVisibility('reset-pass-input', this)" style="position: absolute; right: 10px; background: transparent; border: none; color: var(--muted); cursor: pointer; padding: 6px;">
+                  <i class="fa-regular fa-eye"></i>
+                </button>
+              </div>
+            </label>
+
+            <label>Confirm New Password
+              <input type="password" id="reset-confirm-pass-input" required placeholder="Re-enter new password" minlength="4" style="margin-top: 4px;" />
+            </label>
+          </div>
+
+          <button class="join-btn" type="submit" style="width: 100%; background: linear-gradient(135deg, var(--lime), #8fd915); color: #070909; font-weight: 850;">
+            <i class="fa-solid fa-lock-open" style="margin-right: 8px;"></i> Verify OTP & Reset Password
+          </button>
+        </form>
+      </div>
     </div>
 
     <!-- Modal: Change Owner Credentials Modal -->

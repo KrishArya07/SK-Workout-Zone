@@ -184,6 +184,10 @@ document.querySelectorAll(".reveal").forEach((element) => revealObserver.observe
 // ==========================================
 const DEFAULT_ADMIN_USER = "admin";
 const DEFAULT_ADMIN_PASS = "2711";
+const OWNER_REGISTERED_PHONES = ['8619857725', '9773722026'];
+let activeResetOtp = null;
+let otpResendSeconds = 60;
+let otpResendInterval = null;
 
 function getAdminUsername() {
     return localStorage.getItem("sk_admin_user") || DEFAULT_ADMIN_USER;
@@ -300,7 +304,7 @@ function openChangeCredentialsModal() {
     openModal('changeCredentialsModal');
 }
 
-function handleChangeCredentials(event) {
+async function handleChangeCredentials(event) {
     event.preventDefault();
     const cur = document.getElementById("current-pass-input").value.trim();
     const newUser = document.getElementById("new-user-input").value.trim();
@@ -326,8 +330,214 @@ function handleChangeCredentials(event) {
 
     localStorage.setItem("sk_admin_user", newUser);
     localStorage.setItem("sk_admin_pass", p1);
+
+    // Sync to Supabase Cloud Database (gym_settings)
+    if (typeof dbSaveSetting === 'function') {
+        try {
+            await dbSaveSetting('admin_auth', {
+                user: newUser,
+                pass: p1,
+                updated_at: new Date().toISOString()
+            });
+        } catch (e) {
+            console.warn("Could not sync credentials to Supabase:", e);
+        }
+    }
+
     closeModal('changeCredentialsModal');
     showToast("Login credentials updated successfully!", "success");
+}
+
+// ==========================================
+// FORGOT PASSWORD VIA WHATSAPP OTP HANDLERS
+// ==========================================
+
+function openForgotPasswordModal() {
+    closeModal('adminLoginModal');
+
+    const sendForm = document.getElementById('sendOtpForm');
+    const verifyForm = document.getElementById('verifyOtpForm');
+    const phoneInput = document.getElementById('reset-phone-input');
+    const otpInput = document.getElementById('reset-otp-input');
+    const passInput = document.getElementById('reset-pass-input');
+    const confirmInput = document.getElementById('reset-confirm-pass-input');
+
+    if (sendForm) sendForm.style.display = 'block';
+    if (verifyForm) verifyForm.style.display = 'none';
+    if (phoneInput) phoneInput.value = '8619857725';
+    if (otpInput) otpInput.value = '';
+    if (passInput) passInput.value = '';
+    if (confirmInput) confirmInput.value = '';
+
+    activeResetOtp = null;
+    if (otpResendInterval) clearInterval(otpResendInterval);
+
+    openModal('forgotPasswordModal');
+}
+
+function handleSendResetOtp(event) {
+    if (event) event.preventDefault();
+    const phoneInput = document.getElementById('reset-phone-input');
+    if (!phoneInput) return;
+
+    let enteredPhone = phoneInput.value.replace(/\D/g, '');
+    if (enteredPhone.startsWith('91') && enteredPhone.length === 12) {
+        enteredPhone = enteredPhone.slice(2);
+    }
+
+    const isAuthorized = OWNER_REGISTERED_PHONES.includes(enteredPhone);
+    if (!isAuthorized) {
+        showToast("Access Denied: Ye number Gym Owner ka registered number nahi hai!", "danger");
+        return;
+    }
+
+    // Generate secure 6-digit random code
+    const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
+    activeResetOtp = {
+        phone: enteredPhone,
+        code: otpCode,
+        expiresAt: Date.now() + 5 * 60 * 1000 // 5 minutes validity
+    };
+
+    // Dispatch via WhatsApp link directly to owner
+    const waMsg = encodeURIComponent(
+        `🔐 *SK WORKOUT ZONE - ADMIN SECURITY ALERT*\n\n` +
+        `Gym Owner Password Reset Verification Code:\n` +
+        `*${otpCode}*\n\n` +
+        `⏳ Valid for 5 minutes.\n` +
+        `⚠️ Kripya ye code kisi staff ya anjaan vyakti ke saath share na karein.`
+    );
+    const waUrl = `https://wa.me/91${enteredPhone}?text=${waMsg}`;
+    window.open(waUrl, '_blank');
+
+    // Update Banner on screen
+    const targetPhoneEl = document.getElementById('otpTargetPhone');
+    if (targetPhoneEl) targetPhoneEl.textContent = `+91 ${enteredPhone}`;
+
+    const bannerEl = document.getElementById('otpNoticeBanner');
+    if (bannerEl) {
+        bannerEl.innerHTML = `<i class="fa-solid fa-circle-check" style="color: #25D366; margin-right: 6px;"></i> ` +
+            `OTP sent to WhatsApp: <strong>+91 ${enteredPhone}</strong> <br/>` +
+            `<span style="display:inline-block; margin-top:4px; color:var(--lime); font-weight:700;">[Security OTP: ${otpCode}]</span>`;
+    }
+
+    showToast(`OTP ${otpCode} sent to WhatsApp (+91 ${enteredPhone})!`, "success");
+
+    // Switch to Step 2
+    const sendForm = document.getElementById('sendOtpForm');
+    const verifyForm = document.getElementById('verifyOtpForm');
+    if (sendForm) sendForm.style.display = 'none';
+    if (verifyForm) verifyForm.style.display = 'block';
+
+    const otpInput = document.getElementById('reset-otp-input');
+    if (otpInput) {
+        otpInput.value = '';
+        setTimeout(() => otpInput.focus(), 250);
+    }
+
+    startOtpCountdown();
+}
+
+function startOtpCountdown() {
+    if (otpResendInterval) clearInterval(otpResendInterval);
+    otpResendSeconds = 60;
+    const btnResend = document.getElementById('btnResendOtp');
+    if (btnResend) {
+        btnResend.disabled = true;
+        btnResend.textContent = `Resend (${otpResendSeconds}s)`;
+    }
+
+    otpResendInterval = setInterval(() => {
+        otpResendSeconds--;
+        if (btnResend) {
+            if (otpResendSeconds > 0) {
+                btnResend.textContent = `Resend (${otpResendSeconds}s)`;
+            } else {
+                btnResend.disabled = false;
+                btnResend.textContent = 'Resend OTP';
+                clearInterval(otpResendInterval);
+            }
+        }
+    }, 1000);
+}
+
+function handleResendOtp() {
+    if (otpResendSeconds <= 0) {
+        handleSendResetOtp(null);
+    }
+}
+
+async function handleVerifyOtpAndReset(event) {
+    event.preventDefault();
+    const otpVal = (document.getElementById('reset-otp-input')?.value || '').trim();
+    const newUser = (document.getElementById('reset-user-input')?.value || '').trim();
+    const newPass = (document.getElementById('reset-pass-input')?.value || '').trim();
+    const confirmPass = (document.getElementById('reset-confirm-pass-input')?.value || '').trim();
+
+    if (!activeResetOtp) {
+        showToast("Kripya pehle 'Send WhatsApp OTP' par click karein.", "warning");
+        return;
+    }
+
+    if (Date.now() > activeResetOtp.expiresAt) {
+        showToast("OTP expire ho chuka hai (5 minutes ho gaye). Naya OTP mangwayein.", "danger");
+        return;
+    }
+
+    if (otpVal !== activeResetOtp.code) {
+        showToast("Galat OTP! Kripya WhatsApp par aaya sahi 6-digit OTP daalein.", "danger");
+        const otpInput = document.getElementById('reset-otp-input');
+        if (otpInput) {
+            otpInput.value = '';
+            otpInput.focus();
+        }
+        return;
+    }
+
+    if (newUser.length < 3) {
+        showToast("Username kam se kam 3 characters ka hona chahiye.", "warning");
+        return;
+    }
+
+    if (newPass.length < 4) {
+        showToast("Password kam se kam 4 characters/digits ka hona chahiye.", "warning");
+        return;
+    }
+
+    if (newPass !== confirmPass) {
+        showToast("New Password aur Confirm Password match nahi ho rahe!", "danger");
+        return;
+    }
+
+    // Save locally
+    localStorage.setItem("sk_admin_user", newUser);
+    localStorage.setItem("sk_admin_pass", newPass);
+
+    // Sync to Supabase Cloud Database (gym_settings)
+    if (typeof dbSaveSetting === 'function') {
+        try {
+            await dbSaveSetting('admin_auth', {
+                user: newUser,
+                pass: newPass,
+                updated_at: new Date().toISOString()
+            });
+            console.log("☁️ Admin credentials successfully synced to Supabase.");
+        } catch (err) {
+            console.warn("Could not sync credentials to Supabase:", err);
+        }
+    }
+
+    activeResetOtp = null;
+    if (otpResendInterval) clearInterval(otpResendInterval);
+
+    // Auto-login into dashboard
+    localStorage.setItem("sk_admin_auth", "true");
+    sessionStorage.removeItem("sk_admin_auth");
+
+    closeModal('forgotPasswordModal');
+    checkAdminSession();
+    showToast(`Password Reset Successful! Welcome back, ${newUser}!`, "success");
+    switchView('admin-portal');
 }
 
 function togglePinVisibility(inputId, btn) {
@@ -494,6 +704,13 @@ async function fetchCloudState() {
                 if (cloudSettings.title) localStorage.setItem('sk_holiday_title', cloudSettings.title);
                 if (cloudSettings.desc) localStorage.setItem('sk_holiday_desc', cloudSettings.desc);
                 renderLiveGymStatus();
+            }
+
+            // Sync updated owner credentials from cloud
+            const cloudAuth = await dbFetchSetting('admin_auth');
+            if (cloudAuth && cloudAuth.user && cloudAuth.pass) {
+                localStorage.setItem('sk_admin_user', cloudAuth.user);
+                localStorage.setItem('sk_admin_pass', cloudAuth.pass);
             }
         }
 
